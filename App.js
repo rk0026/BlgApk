@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
-import { Platform, StyleSheet, View, BackHandler, Dimensions, Linking } from 'react-native';
+import { Platform, StyleSheet, View, BackHandler, Dimensions } from 'react-native';
 import { WebView } from 'react-native-webview';
-import config from './config';
+import { config } from './config';
 
 const window = Dimensions.get('window');
 
