@@ -6,27 +6,29 @@ import config from './config';
 const window = Dimensions.get('window');
 
 export default class App extends PureComponent {
-  webView = {
-      canGoBack: false,
-      ref: null,
-  }
+    constructor(props) {
+        super(props);
+        this.webView = React.createRef();
+        this.state = {
+            canGoBack: false,
+        };
+    }
 
+    componentDidMount() {
+        if (Platform.OS === 'android') {
+            BackHandler.addEventListener('hardwareBackPress', this.onAndroidBackPress);
+        }
+    }
 
-  componentDidMount() {
-      if (Platform.OS === 'android') {
-          BackHandler.addEventListener('hardwareBackPress', this.onAndroidBackPress);
-      }
-  }
-
-  componentWillUnmount() {
-      if (Platform.OS === 'android') {
-          BackHandler.removeEventListener('hardwareBackPress');
-      }
-  }
+    componentWillUnmount() {
+        if (Platform.OS === 'android') {
+            BackHandler.removeEventListener('hardwareBackPress');
+        }
+    }
 
   onAndroidBackPress = () => {
-      if (this.webView.canGoBack) {
-          this.webView.ref.goBack();
+      if (this.state.canGoBack) {
+          this.webView.current.goBack();
           return true;
       }
       return true;
@@ -48,17 +50,11 @@ export default class App extends PureComponent {
               <WebView
                   source={{ uri }}
                   style={styles.webView}
-                  ref={(webView) => {
-                      this.webView.ref = webView;
-                  }}
+                  ref={this.webView}
                   useWebKit={false}
-                  onNavigationStateChange={(navState) => {
-                      this.webView.canGoBack = navState.canGoBack;
-                      // if (navState.url.indexOf(uri) === -1) {
-                      //     this.webView.ref.stopLoading();
-                      //     Linking.openURL(navState.url);
-                      // }
-                  }}
+                  onNavigationStateChange={navState => this.setState({
+                      canGoBack: navState.canGoBack,
+                  })}
                   onError={console.error.bind(console, 'error')}
                   javaScriptEnabled
                   domStorageEnabled
