@@ -39,4 +39,8 @@
 #endif
 }
 
+(UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+return [Orientation getOrientation];
+}
+
 @end

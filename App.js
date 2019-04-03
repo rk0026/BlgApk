@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Platform, StyleSheet, View, BackHandler, Dimensions } from 'react-native';
 import { WebView } from 'react-native-webview';
+import Orientation from 'react-native-orientation-locker';
 import { config } from './config';
 
 const window = Dimensions.get('window');
@@ -18,6 +19,7 @@ export default class App extends PureComponent {
         if (Platform.OS === 'android') {
             BackHandler.addEventListener('hardwareBackPress', this.onAndroidBackPress);
         }
+        Orientation.lockToPortrait();
     }
 
     componentWillUnmount() {
@@ -26,44 +28,44 @@ export default class App extends PureComponent {
         }
     }
 
-  onAndroidBackPress = () => {
-      if (this.state.canGoBack) {
-          this.webView.current.goBack();
-          return true;
-      }
-      return true;
-  }
-  // openExternalLink(req) {
-  //   // const isLocal = req.url.indexOf(config.uri) !== -1;
-  //   // if (isLocal) {
-  //   //   return true;
-  //   // } else {
-  //     Linking.openURL(req.url);
-  //     return false;
-  //   // }
-  // }
+    onAndroidBackPress = () => {
+        if (this.state.canGoBack) {
+            this.webView.current.goBack();
+            return true;
+        }
+        return true;
+    }
 
-  render() {
-      const { uri } = config;
-      return (
-          <View style={styles.container}>
-              <WebView
-                  source={{ uri }}
-                  style={styles.webView}
-                  ref={this.webView}
-                  useWebKit={false}
-                  onNavigationStateChange={navState => this.setState({
-                      canGoBack: navState.canGoBack,
-                  })}
-                  onError={console.error.bind(console, 'error')}
-                  javaScriptEnabled
-                  domStorageEnabled
-                  allowUniversalAccessFromFileURLs
-                  // onShouldStartLoadWithRequest={request => !request.url.startsWith(config.uri)}
-              />
-          </View>
-      );
-  }
+    onNavigationStateChange = (navState) => {
+        if (!navState.url.startsWith(config.uri)) {
+            Orientation.unlockAllOrientations();
+        }
+        else {
+            Orientation.lockToPortrait();
+        }
+        this.setState({
+            canGoBack: navState.canGoBack,
+        });
+    }
+
+    render() {
+        const { uri } = config;
+        return (
+            <View style={styles.container}>
+                <WebView
+                    source={{ uri }}
+                    style={styles.webView}
+                    ref={this.webView}
+                    useWebKit={false}
+                    onNavigationStateChange={this.onNavigationStateChange}
+                    onError={console.error.bind(console, 'error')}
+                    javaScriptEnabled
+                    domStorageEnabled
+                    allowUniversalAccessFromFileURLs
+                />
+            </View>
+        );
+    }
 }
 
 const styles = StyleSheet.create({
@@ -74,7 +76,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     webView: {
-        width: window.width,
-        height: window.height,
+        width: window.width < window.height ? window.width : window.height,
+        height: window.width < window.height ? window.height : window.width,
     },
 });
