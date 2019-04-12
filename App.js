@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import { Platform, StyleSheet, View, BackHandler, Dimensions } from 'react-native';
 import { WebView } from 'react-native-webview';
-import Orientation from 'react-native-orientation-locker';
+// import Orientation from 'react-native-orientation-locker';
 import { config } from './config';
 
 const window = Dimensions.get('window');
@@ -19,7 +19,7 @@ export default class App extends PureComponent {
         if (Platform.OS === 'android') {
             BackHandler.addEventListener('hardwareBackPress', this.onAndroidBackPress);
         }
-        Orientation.lockToPortrait();
+        // Orientation.lockToPortrait();
     }
 
     componentWillUnmount() {
@@ -37,12 +37,12 @@ export default class App extends PureComponent {
     }
 
     onNavigationStateChange = (navState) => {
-        if (!navState.url.startsWith(config.uri)) {
-            Orientation.unlockAllOrientations();
-        }
-        else {
-            Orientation.lockToPortrait();
-        }
+        // if (!navState.url.startsWith(config.uri)) {
+        //     Orientation.unlockAllOrientations();
+        // }
+        // else {
+        //     Orientation.lockToPortrait();
+        // }
         this.setState({
             canGoBack: navState.canGoBack,
         });
